@@ -19,7 +19,7 @@
     }
   },
   "bin": {
-    "mbc-mcp": "./dist/cli.js"
+    "mbc-mcp": "dist/cli.js"
   },
   "files": [
     "dist",
