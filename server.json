@@ -1,0 +1,18 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "description": "Convert, view, split, merge and track betting codes across bookmakers.",
+  "name": "app.managebetcodes/managebetcodes-mcp",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://api.managebetcodes.app/v1/mcp"
+    }
+  ],
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/kayceepeece/managebetcodes-mcp"
+  },
+  "title": "Manage Bet Codes",
+  "version": "1.0.0",
+  "websiteUrl": "https://managebetcodes.app/mcp"
+}

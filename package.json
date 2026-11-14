@@ -1,0 +1,53 @@
+{
+  "name": "@managebetcodes/mcp",
+  "version": "1.0.0",
+  "description": "Official Model Context Protocol (MCP) server for Manage Bet Codes API v1",
+  "license": "MIT",
+  "author": "Manage Bet Codes",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kayceepeece/managebetcodes-mcp.git"
+  },
+  "homepage": "https://managebetcodes.app/mcp",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "mbc-mcp": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test test/mcp-server.test.mjs",
+    "prepack": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "betting",
+    "bet-codes",
+    "sportybet",
+    "1xbet",
+    "bet9ja",
+    "managebetcodes"
+  ],
+  "devDependencies": {
+    "typescript": "^5.4.0"
+  }
+}

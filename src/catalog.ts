@@ -1,0 +1,797 @@
+export interface McpToolDefinition {
+  name: string;
+  title: string;
+  description: string;
+  inputSchema: Record<string, unknown>;
+  outputSchema: Record<string, unknown>;
+  annotations: {
+    readOnlyHint: boolean;
+    destructiveHint: boolean;
+    idempotentHint: boolean;
+    openWorldHint: boolean;
+  };
+}
+
+export interface McpResourceDefinition {
+  uri: string;
+  name: string;
+  description: string;
+  mimeType: string;
+}
+
+export interface McpPromptDefinition {
+  name: string;
+  description: string;
+  arguments: Array<{
+    name: string;
+    description: string;
+    required: boolean;
+  }>;
+}
+
+export const MCP_TOOLS: readonly McpToolDefinition[] = [
+  {
+    name: "mbc_list_bookmakers",
+    title: "List Supported Bookmakers",
+    description:
+      "List all 29 supported bookmakers with their canonical keys, aliases, code format hints, and capability flags (supports_book, supports_search, supports_tracking, supports_split, conversion_mode). Costs 0 credits. Note: bare '1xbet' and 'afropari' are retired; use '1xng'/'1xglobal' and 'afropari_ng'/'afropari_global'.",
+    inputSchema: { type: "object", properties: {}, required: [] },
+    outputSchema: {
+      type: "object",
+      properties: {
+        count: { type: "integer" },
+        bookmakers: { type: "array" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
+    name: "mbc_list_markets",
+    title: "List Canonical Betting Markets",
+    description:
+      "List all canonical betting markets (1X2, Over/Under, Both Teams To Score, Double Chance, Asian Handicap, European Handicap, totals) and their valid outcome names for resolving and booking games. Costs 0 credits.",
+    inputSchema: { type: "object", properties: {}, required: [] },
+    outputSchema: {
+      type: "object",
+      properties: {
+        count: { type: "integer" },
+        markets: { type: "array" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
+    name: "mbc_get_usage",
+    title: "Check API Plan, Credits & Rate Limits",
+    description:
+      "Read the caller's active plan, key charge_order, API credits (monthly plan plus never-expiring packs), regular daily credits, rate limit windows, and active jobs and tracks. Costs 0 credits.",
+    inputSchema: { type: "object", properties: {}, required: [] },
+    outputSchema: {
+      type: "object",
+      properties: {
+        charge_order: { type: "string" },
+        plan: { type: "object" },
+        api_credits: { type: "object" },
+        regular_credits: { type: "object" },
+        rate_limits: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: false,
+    },
+  },
+  {
+    name: "mbc_view_slip",
+    title: "View Bet Slip (JSON & Text)",
+    description:
+      "Load a booking code on a bookmaker and return all games, markets, outcomes, odds, live scores, kickoff times, and total odds. Costs 1 credit after a successful read; failed lookups cost 0 credits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Booking code (e.g. '7B9A2F')." },
+        bookmaker: {
+          type: "string",
+          description: "Bookmaker key or alias (e.g. 'sportybet', 'bet9ja', '1xng', 'msport').",
+        },
+      },
+      required: ["code", "bookmaker"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string" },
+        bookmaker: { type: "object" },
+        status: { type: "string" },
+        selections: { type: "array" },
+        total_odds: { type: "string" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_view_slip_image",
+    title: "Render Bet Slip Image (PNG)",
+    description:
+      "Render a branded PNG slip image for a booking code on a bookmaker. Returns an MCP ImageContent block (image/png) plus a summary. Costs 2 credits after a successful render; failed renders cost 0 credits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Booking code (e.g. '7B9A2F')." },
+        bookmaker: {
+          type: "string",
+          description: "Bookmaker key or alias (e.g. 'sportybet', 'bet9ja', '1xng').",
+        },
+      },
+      required: ["code", "bookmaker"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string" },
+        bookmaker: { type: "string" },
+        mime_type: { type: "string" },
+        credits_charged: { type: "integer" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_convert_code",
+    title: "Convert Bet Code (1 to 6 Targets)",
+    description:
+      "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 27), use mbc_convert_to_all.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Source booking code (e.g. '7B9A2F')." },
+        from_bookmaker: {
+          type: "string",
+          description: "Source bookmaker key or alias (e.g. 'sportybet', 'bet9ja', '1xng', 'stake').",
+        },
+        to_bookmakers: {
+          oneOf: [
+            { type: "string" },
+            { type: "array", items: { type: "string" }, minItems: 1, maxItems: 6 },
+          ],
+          description: "Target bookmaker key/alias or list of 1 to 6 targets (e.g. '1xng' or ['1xng', 'bet9ja', 'msport']).",
+        },
+      },
+      required: ["code", "from_bookmaker", "to_bookmakers"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        source: { type: "object" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_convert_to_all",
+    title: "Convert One Bet Code to All Bookmakers",
+    description:
+      "Convert one booking code to ALL supported target bookmakers at once (up to 27 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Source booking code (e.g. '7B9A2F')." },
+        from_bookmaker: {
+          type: "string",
+          description: "Source bookmaker key or alias (e.g. 'sportybet', 'bet9ja').",
+        },
+        targets: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional list of target bookmaker keys. Omit to convert to all eligible bookmakers.",
+        },
+        include_card: {
+          type: "boolean",
+          description: "Set true to also render a 1080x1920 PNG share card with all converted codes.",
+        },
+      },
+      required: ["code", "from_bookmaker"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        pairs: { type: "integer" },
+        successful_pairs: { type: "integer" },
+        slips: { type: "array" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_bulk_convert",
+    title: "Bulk Convert Multiple Bet Codes",
+    description:
+      "Convert 2 to 4 source booking codes synchronously across all or selected target bookmakers in one batch (each slip's own source bookmaker is automatically excluded from its targets). Costs 2 credits per successful (code, target) pair; failed pairs cost 0 credits. For 5 to 20 source codes, use mbc_manage_jobs_and_history with action='create_job' and kind='convert'.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        codes: {
+          type: "array",
+          minItems: 2,
+          maxItems: 4,
+          description: "2 to 4 source slips to bulk convert.",
+          items: {
+            type: "object",
+            properties: {
+              code: { type: "string", description: "Booking code." },
+              from_bookmaker: {
+                type: "string",
+                description: "Source bookmaker key or alias.",
+              },
+            },
+            required: ["code", "from_bookmaker"],
+          },
+        },
+        targets: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional target bookmaker keys. Omit to convert each slip to all eligible bookmakers.",
+        },
+        include_card: {
+          type: "boolean",
+          description: "Set true to render a combined 1080x1920 PNG share card containing all slips.",
+        },
+      },
+      required: ["codes"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        pairs: { type: "integer" },
+        successful_pairs: { type: "integer" },
+        slips: { type: "array" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_split_code",
+    title: "Split Bet Code Into 2–20 Codes",
+    description:
+      "Divide one booking code into 2 to 20 smaller codes on the same bookmaker so every game lands in exactly one new code. Supports 4 split methods: 'equal' (spread games evenly across codes), 'by_batches' (keep consecutive games together in each code), 'target_odds' (group games to reach a chosen combined odds per code), and 'custom' (set exact game counts per output code). Supports 2 game orders: 'mixed' (keep original slip order) and 'by_start_time' (earliest games first, latest games last). Costs 2 credits plus 1 credit per extra created code; unused parts are refunded.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        code: { type: "string", description: "Booking code to split." },
+        bookmaker: {
+          type: "string",
+          description: "Bookmaker key or alias (e.g. 'sportybet', 'bet9ja', '1xng', 'msport').",
+        },
+        method: {
+          type: "string",
+          enum: ["equal", "by_batches", "target_odds", "custom"],
+          description: "Split method: 'equal', 'by_batches', 'target_odds', or 'custom' (default 'equal').",
+        },
+        order: {
+          type: "string",
+          enum: ["mixed", "by_start_time"],
+          description: "Game order: 'mixed' (original slip order) or 'by_start_time' (sorted by kickoff).",
+        },
+        count: {
+          type: "integer",
+          minimum: 2,
+          maximum: 20,
+          description: "Number of output codes (2 to 20) when method is 'equal' or 'by_batches'.",
+        },
+        target_odds: {
+          type: "number",
+          exclusiveMinimum: 1.0,
+          description: "Target combined odds per output code (e.g. 5.0) when method is 'target_odds'.",
+        },
+        counts: {
+          type: "array",
+          items: { type: "integer", minimum: 1 },
+          minItems: 2,
+          maxItems: 20,
+          description: "Exact game count for each output code (must sum to total games on the slip) when method is 'custom'.",
+        },
+      },
+      required: ["code", "bookmaker"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        new_codes: { type: "array" },
+        parts: { type: "array" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_merge_codes",
+    title: "Merge 2–30 Bet Codes Into One",
+    description:
+      "Combine 2 to 30 booking codes (from the same or different bookmakers) into one deduplicated booking code on a target bookmaker. Reports any skipped, dropped, or conflicting games. Costs 2 credits for 2 codes plus 1 credit per extra input code; refunded if no code is created.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        pairs: {
+          type: "array",
+          minItems: 2,
+          maxItems: 30,
+          description: "2 to 30 (bookmaker, code) pairs to merge.",
+          items: {
+            type: "object",
+            properties: {
+              bookmaker: { type: "string", description: "Source bookmaker key or alias." },
+              code: { type: "string", description: "Booking code." },
+            },
+            required: ["bookmaker", "code"],
+          },
+        },
+        target: {
+          type: "string",
+          description: "Target bookmaker key or alias (defaults to the first pair's bookmaker).",
+        },
+      },
+      required: ["pairs"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        target_code: { type: "string" },
+        selections_count: { type: "integer" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_search_events",
+    title: "Search Bookmaker Events & Fixtures",
+    description:
+      "Search up to 20 team or head-to-head match queries ('Arsenal vs Chelsea', 'Real Madrid') on a bookmaker. Returns event IDs, kickoff times, confidence ('exact' or 'fuzzy'), and top canonical markets. Costs 0 action credits (counts against daily search cap).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bookmaker: {
+          type: "string",
+          description: "Bookmaker key or alias (e.g. 'sportybet', '1xng', 'betking').",
+        },
+        queries: {
+          type: "array",
+          minItems: 1,
+          maxItems: 20,
+          description: "1 to 20 search queries.",
+          items: {
+            type: "object",
+            properties: {
+              q: {
+                type: "string",
+                description: "Team name ('Arsenal') or head-to-head ('Arsenal vs Chelsea').",
+              },
+              league: {
+                type: "string",
+                description: "Optional league filter substring (e.g. 'Premier League').",
+              },
+              from: { type: "string", description: "Optional start date YYYY-MM-DD." },
+              to: { type: "string", description: "Optional end date YYYY-MM-DD." },
+              limit: { type: "integer", minimum: 1, maximum: 50 },
+            },
+            required: ["q"],
+          },
+        },
+        sport: {
+          type: "string",
+          description: "Sport filter (default 'football'; pass 'all' for all sports).",
+        },
+        include_markets: {
+          type: "boolean",
+          description: "Include top canonical markets on each event (default true).",
+        },
+        market_filter: {
+          type: "array",
+          items: { type: "string" },
+          description: "Optional canonical market names to filter (e.g. ['1X2', 'Over/Under']).",
+        },
+      },
+      required: ["bookmaker", "queries"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: { results: { type: "array" } },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_get_event_markets",
+    title: "Get All Markets & Odds for an Event",
+    description:
+      "Fetch all available canonical markets, lines, outcomes, and live odds for one event_id on a bookmaker. Costs 0 action credits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bookmaker: {
+          type: "string",
+          description: "Bookmaker key or alias (e.g. 'sportybet', '1xng').",
+        },
+        event_id: {
+          type: "string",
+          description: "Event ID from mbc_search_events (e.g. 'sr:match:123').",
+        },
+      },
+      required: ["bookmaker", "event_id"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        bookmaker: { type: "object" },
+        event_id: { type: "string" },
+        markets: { type: "array" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_resolve_picks",
+    title: "Resolve Games Into a 10-Minute Booking Plan",
+    description:
+      "Validate 1 to 50 games (team names or event_ids plus canonical market, outcome, and optional line/odds) on a target bookmaker and create a 10-minute plan_id for mbc_book_code. Returns per-game status ('resolved', 'ambiguous', 'not_found', 'market_missing', 'odds_changed', 'not_bookable'). Costs 0 action credits.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bookmaker: {
+          type: "string",
+          description: "Target bookmaker key or alias (e.g. 'sportybet', '1xng', 'bet9ja').",
+        },
+        picks: {
+          type: "array",
+          minItems: 1,
+          maxItems: 50,
+          description: "1 to 50 games to resolve.",
+          items: {
+            type: "object",
+            properties: {
+              event_id: { type: "string" },
+              home_team: { type: "string" },
+              away_team: { type: "string" },
+              league: { type: "string" },
+              kickoff: { type: "string" },
+              sport: { type: "string" },
+              market: {
+                type: "string",
+                description: "Canonical market (e.g. '1X2', 'Over/Under', 'Both Teams To Score', 'Double Chance').",
+              },
+              market_id: { type: "string" },
+              outcome: {
+                type: "string",
+                description: "Canonical outcome (e.g. 'home', 'draw', 'away', 'over', 'under', 'yes', 'no', '1X', '12', '2X').",
+              },
+              outcome_id: { type: "string" },
+              line: { type: ["number", "string"] },
+              odds: { type: ["number", "string"] },
+            },
+          },
+        },
+        strict: { type: "boolean", description: "Require all games to resolve (default true)." },
+        accept_odds_change: {
+          type: "boolean",
+          description: "Accept moved odds beyond 1% tolerance (default false).",
+        },
+      },
+      required: ["bookmaker", "picks"],
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        plan_id: { type: "string" },
+        status: { type: "string" },
+        picks: { type: "array" },
+        summary: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: true,
+      destructiveHint: false,
+      idempotentHint: true,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_book_code",
+    title: "Book a New Bet Code From Plan or Picks",
+    description:
+      "Mint a new verified booking code on 1 to 6 target bookmakers from either a plan_id (from mbc_resolve_picks) or direct picks. Costs 2 credits per target code created; refunded if no code is created.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        bookmaker: {
+          type: "string",
+          description: "Primary target bookmaker key or alias (e.g. 'sportybet').",
+        },
+        plan_id: {
+          type: "string",
+          description: "10-minute plan_id returned by mbc_resolve_picks.",
+        },
+        picks: {
+          type: "array",
+          items: { type: "object" },
+          description: "Direct game picks when booking without a plan_id.",
+        },
+        to: {
+          type: "array",
+          items: { type: "string" },
+          maxItems: 6,
+          description: "Optional fan-out list of 1 to 6 target bookmakers.",
+        },
+        strict: {
+          type: "boolean",
+          description: "All games must resolve or no code is created (default true).",
+        },
+        accept_odds_change: {
+          type: "boolean",
+          description: "Allow booking if odds moved since resolution (default false).",
+        },
+      },
+    },
+    outputSchema: {
+      type: "object",
+      properties: {
+        success: { type: "boolean" },
+        code: { type: "string" },
+        billing: { type: "object" },
+      },
+    },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_manage_tracking",
+    title: "Start, Inspect, List, or Stop Live Tracking",
+    description:
+      "Manage live match tracking for SportyBet, Football.com, and Betway slips. Actions: 'start' (costs 1 credit; mode 'ticket' fast-fails on a cut, 'game' tracks to the end), 'get' (0 credits), 'list' (0 credits), 'stop' (0 credits).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action: {
+          type: "string",
+          enum: ["start", "get", "list", "stop"],
+          description: "Tracking operation to run.",
+        },
+        code: { type: "string", description: "Booking code (required for 'start')." },
+        bookmaker: {
+          type: "string",
+          description: "Trackable bookmaker: 'sportybet', 'football.com', or 'betway' (default 'sportybet').",
+        },
+        track_id: {
+          type: "string",
+          description: "Track ID 'trk_...' (required for 'get' and 'stop').",
+        },
+        mode: {
+          type: "string",
+          enum: ["ticket", "game"],
+          description: "'ticket' (fast-fail on a losing game) or 'game' (track all games to the end).",
+        },
+        label: { type: "string", description: "Optional label for 'start' (max 80 chars)." },
+        webhook_url: {
+          type: "string",
+          description: "Optional HTTPS webhook URL on port 443/8443 for 'start'.",
+        },
+        status: {
+          type: "string",
+          enum: ["active", "finished", "stopped", "pending_choice"],
+          description: "Optional status filter for 'list'.",
+        },
+      },
+      required: ["action"],
+    },
+    outputSchema: { type: "object" },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: true,
+    },
+  },
+  {
+    name: "mbc_manage_jobs_and_history",
+    title: "Manage Bulk Jobs & Query Conversion / Book History",
+    description:
+      "Create, inspect, list, or cancel async jobs (for >6 targets or up to 20 source codes, requires Developer/Scale/Business API plan), or query past conversion history and book history (0 credits for reads).",
+    inputSchema: {
+      type: "object",
+      properties: {
+        action: {
+          type: "string",
+          enum: [
+            "create_job",
+            "get_job",
+            "list_jobs",
+            "cancel_job",
+            "list_history",
+            "get_history",
+            "list_books",
+            "get_book",
+          ],
+          description: "Operation to perform.",
+        },
+        job_id: { type: "string", description: "Job ID 'job_...' for get_job or cancel_job." },
+        row_id: {
+          type: "string",
+          description: "History ID ('hl_...') or Book ID for get_history or get_book.",
+        },
+        job_payload: {
+          type: "object",
+          description: "Job creation body for create_job: {kind: 'convert'|'split'|'merge'|'book', ...}.",
+        },
+        limit: { type: "integer", minimum: 1, maximum: 100 },
+        offset: { type: "integer", minimum: 0 },
+        status: { type: "string" },
+        bookmaker: { type: "string" },
+        target: { type: "string" },
+      },
+      required: ["action"],
+    },
+    outputSchema: { type: "object" },
+    annotations: {
+      readOnlyHint: false,
+      destructiveHint: false,
+      idempotentHint: false,
+      openWorldHint: false,
+    },
+  },
+];
+
+export const MCP_RESOURCES: readonly McpResourceDefinition[] = [
+  {
+    uri: "mbc://catalog/bookmakers",
+    name: "Supported Bookmakers & Capabilities",
+    description: "All 29 bookmakers, canonical keys, aliases, code regex hints, and capability flags.",
+    mimeType: "application/json",
+  },
+  {
+    uri: "mbc://catalog/markets",
+    name: "Canonical Market & Outcome Catalog",
+    description: "Canonical market names and valid outcome identifiers for resolving and booking games.",
+    mimeType: "application/json",
+  },
+  {
+    uri: "mbc://catalog/capabilities",
+    name: "API Manifest, Prices & Limits",
+    description: "Machine-readable manifest of routes, credit prices, limits, and enums.",
+    mimeType: "application/json",
+  },
+  {
+    uri: "mbc://account/usage",
+    name: "Caller Plan, Credits & Rate Limits",
+    description: "Current API credit balance, regular daily credit balance, charge_order, and active limits.",
+    mimeType: "application/json",
+  },
+];
+
+export const MCP_PROMPTS: readonly McpPromptDefinition[] = [
+  {
+    name: "convert-to-all-bookmakers",
+    description:
+      "Convert one booking code to all supported bookmakers and summarize every new code and any unmappable games.",
+    arguments: [
+      { name: "code", description: "Source booking code", required: true },
+      { name: "from_bookmaker", description: "Source bookmaker key or alias", required: true },
+      {
+        name: "targets",
+        description: "Optional comma-separated target bookmakers (omit for all)",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "bulk-convert-codes",
+    description: "Bulk convert 2 to 4 booking codes across all or selected bookmakers.",
+    arguments: [
+      {
+        name: "codes_list",
+        description: "List of codes with bookmakers, e.g. 'sportybet:7B9A2F, bet9ja:B9JA12'",
+        required: true,
+      },
+      { name: "targets", description: "Optional target bookmakers (omit for all)", required: false },
+    ],
+  },
+  {
+    name: "split-slip",
+    description:
+      "Split one booking code into 2 to 20 smaller codes using Equal, By batches, Target odds, or Custom counts.",
+    arguments: [
+      { name: "code", description: "Booking code to split", required: true },
+      { name: "bookmaker", description: "Bookmaker key or alias", required: true },
+      {
+        name: "method",
+        description: "Split method: equal, by_batches, target_odds, or custom",
+        required: false,
+      },
+      { name: "order", description: "Game order: mixed or by_start_time", required: false },
+      {
+        name: "value",
+        description: "Number of codes (2-20), target odds (e.g. 5.0), or custom game counts (e.g. 3,3,2)",
+        required: false,
+      },
+    ],
+  },
+  {
+    name: "build-slip-from-text",
+    description: "Resolve natural-language games into a 10-minute plan and book a verified code.",
+    arguments: [
+      { name: "bookmaker", description: "Target bookmaker key or alias", required: true },
+      {
+        name: "picks_text",
+        description: "Games and markets to book (e.g. 'Arsenal vs Chelsea Over 2.5, Real Madrid to win')",
+        required: true,
+      },
+    ],
+  },
+];
