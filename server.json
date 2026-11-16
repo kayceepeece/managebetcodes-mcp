@@ -9,7 +9,7 @@
     }
   ],
   "repository": {
-    "type": "github",
+    "source": "github",
     "url": "https://github.com/kayceepeece/managebetcodes-mcp"
   },
   "title": "Manage Bet Codes",
