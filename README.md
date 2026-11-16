@@ -50,7 +50,7 @@ If your MCP host supports remote HTTP servers, no local package is required:
 - `mbc_convert_to_all` — Convert 1 code to all 27 supported target bookmakers at once (2 credits per successful target).
 - `mbc_bulk_convert` — Bulk convert 2–4 source codes across selected or all bookmakers (2 credits per successful pair).
 - `mbc_split_code` — Split 1 code into 2–20 codes on the same bookmaker using `equal`, `by_batches`, `target_odds`, or `custom` with `mixed` or `by_start_time` order (2 credits + 1 per extra created code).
-- `mbc_merge_codes` — Merge 2–30 `(bookmaker, code)` pairs into 1 deduplicated code (2 credits + 1 per extra code).
+- `mbc_merge_codes` — Merge 2–30 `(bookmaker, code)` pairs into 1 deduplicated code (2 credits covers one code (one already on the target bookmaker if any); each other code adds 1 if it's on the target bookmaker or 2 if it's from a different bookmaker; refunded if no code is created).
 - `mbc_search_events` — Batch search up to 20 team/fixture queries with markets (0 credits).
 - `mbc_get_event_markets` — List all canonical markets and live odds for an `event_id` (0 credits).
 - `mbc_resolve_picks` — Validate 1–50 games into a 10-minute `plan_id` (0 credits).

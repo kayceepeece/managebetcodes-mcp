@@ -357,7 +357,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_merge_codes",
     title: "Merge 2–30 Bet Codes Into One",
     description:
-      "Combine 2 to 30 booking codes (from the same or different bookmakers) into one deduplicated booking code on a target bookmaker. Reports any skipped, dropped, or conflicting games. Costs 2 credits for 2 codes plus 1 credit per extra input code; refunded if no code is created.",
+      "Combine 2 to 30 booking codes (from the same or different bookmakers) into one deduplicated booking code on a target bookmaker. Reports any skipped, dropped, or conflicting games. Costs 2 credits for one code (one already on the target bookmaker if any); each other code adds 1 if it's on the target bookmaker or 2 if it's from a different bookmaker; refunded if no code is created.",
     inputSchema: {
       type: "object",
       properties: {

@@ -1,6 +1,6 @@
 {
   "name": "@managebetcodes/mcp",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Official Model Context Protocol (MCP) server for Manage Bet Codes API v1",
   "license": "MIT",
   "author": "Manage Bet Codes",
