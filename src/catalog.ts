@@ -217,7 +217,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
         },
         include_card: {
           type: "boolean",
-          description: "Set true to also render a 1080x1920 PNG share card with all converted codes.",
+          description: "Set true to also render a PNG share card with all converted codes (1080 px wide, as tall as the content).",
         },
       },
       required: ["code", "from_bookmaker"],
@@ -271,7 +271,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
         },
         include_card: {
           type: "boolean",
-          description: "Set true to render a combined 1080x1920 PNG share card containing all slips.",
+          description: "Set true to render a combined PNG share card containing all slips (1080 px wide, as tall as the content).",
         },
       },
       required: ["codes"],
