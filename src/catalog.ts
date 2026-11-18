@@ -756,7 +756,7 @@ export const MCP_PROMPTS: readonly McpPromptDefinition[] = [
     arguments: [
       {
         name: "codes_list",
-        description: "List of codes with bookmakers, e.g. 'sportybet:7B9A2F, bet9ja:B9JA12'",
+        description: "List of codes with bookmakers, e.g. 'sportybet:7B9A2F, bet9ja:5B9JA12'",
         required: true,
       },
       { name: "targets", description: "Optional target bookmakers (omit for all)", required: false },
