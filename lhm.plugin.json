@@ -95,7 +95,7 @@
     {
       "name": "Supported Bookmakers & Capabilities",
       "uri": "mbc://catalog/bookmakers",
-      "description": "All 29 bookmakers, canonical keys, aliases, code regex hints, and capability flags.",
+      "description": "All 44 bookmakers, canonical keys, aliases, code regex hints, and capability flags.",
       "mimeType": "application/json"
     },
     {
@@ -131,7 +131,7 @@
     {
       "name": "mbc_list_bookmakers",
       "title": "List Supported Bookmakers",
-      "description": "List all 29 supported bookmakers with their canonical keys, aliases, code format hints, and capability flags (supports_book, supports_search, supports_tracking, supports_split, conversion_mode). Costs 0 credits. Note: bare '1xbet' and 'afropari' are retired; use '1xng'/'1xglobal' and 'afropari_ng'/'afropari_global'.",
+      "description": "List all 44 supported bookmakers with their canonical keys, aliases, code format hints, and capability flags (supports_book, supports_search, supports_tracking, supports_split, conversion_mode, countries). Costs 0 credits. Note: bare '1xbet' and 'afropari' are retired; use '1xng'/'1xglobal' and 'afropari_ng'/'afropari_global'.",
       "inputSchema": {
         "type": "object",
         "properties": {},
@@ -317,7 +317,7 @@
     {
       "name": "mbc_convert_code",
       "title": "Convert Bet Code (1 to 6 Targets)",
-      "description": "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 27), use mbc_convert_to_all.",
+      "description": "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 28), use mbc_convert_to_all.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -376,7 +376,7 @@
     {
       "name": "mbc_convert_to_all",
       "title": "Convert One Bet Code to All Bookmakers",
-      "description": "Convert one booking code to ALL supported target bookmakers at once (up to 27 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits.",
+      "description": "Convert one booking code to all 28 default target bookmakers at once (up to 28 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com, Betway), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits. Country variants are opt-in through the targets list.",
       "inputSchema": {
         "type": "object",
         "properties": {
