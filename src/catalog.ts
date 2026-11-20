@@ -464,7 +464,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_get_event_markets",
     title: "Get All Markets & Odds for an Event",
     description:
-      "Fetch all available canonical markets, lines, outcomes, and live odds for one event_id on a bookmaker. Costs 0 action credits.",
+      "Fetch markets, lines, outcomes, and live odds for one event_id on a bookmaker. Start with names_only=true to learn the market names, then request one name with market= or narrow with q=. view=all adds native markets (canonical: false) and needs market= or q=. Each outcome carries a key for mbc_resolve_picks. Costs one search unit per call.",
     inputSchema: {
       type: "object",
       properties: {
@@ -476,6 +476,26 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
           type: "string",
           description: "Event ID from mbc_search_events (e.g. 'sr:match:123').",
         },
+        view: {
+          type: "string",
+          enum: ["canonical", "all"],
+          description: "canonical (default) or all. all requires market= or q=.",
+        },
+        market: {
+          type: ["string", "array"],
+          items: { type: "string" },
+          description:
+            "Full market name (exact, case-insensitive) or a substring. Repeat it to request several names.",
+        },
+        q: {
+          type: "string",
+          description: "Substring match against every canonical and native market name.",
+        },
+        names_only: {
+          type: "boolean",
+          description:
+            "Return the names only, with no outcomes or prices. The list is complete, not capped.",
+        },
       },
       required: ["bookmaker", "event_id"],
     },
@@ -484,7 +504,12 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
       properties: {
         bookmaker: { type: "object" },
         event_id: { type: "string" },
+        requested: { type: "array" },
+        truncated: { type: "boolean" },
         markets: { type: "array" },
+        not_found: { type: "array" },
+        count: { type: "number" },
+        names: { type: "array" },
       },
     },
     annotations: {
@@ -520,16 +545,19 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
               league: { type: "string" },
               kickoff: { type: "string" },
               sport: { type: "string" },
+              key: {
+                type: "string",
+                description:
+                  "Selection key from mbc_get_event_markets. Send it with event_id in the same pick.",
+              },
               market: {
                 type: "string",
                 description: "Canonical market (e.g. '1X2', 'Over/Under', 'Both Teams To Score', 'Double Chance').",
               },
-              market_id: { type: "string" },
               outcome: {
                 type: "string",
                 description: "Canonical outcome (e.g. 'home', 'draw', 'away', 'over', 'under', 'yes', 'no', '1X', '12', '2X').",
               },
-              outcome_id: { type: "string" },
               line: { type: ["number", "string"] },
               odds: { type: ["number", "string"] },
             },
@@ -563,13 +591,13 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_book_code",
     title: "Book a New Bet Code From Plan or Picks",
     description:
-      "Mint a new verified booking code on 1 to 6 target bookmakers from either a plan_id (from mbc_resolve_picks) or direct picks. Costs 2 credits per target code created; refunded if no code is created.",
+      "Mint a new verified booking code on 1 to 6 target bookmakers from either a plan_id (from mbc_resolve_picks) or direct picks. A key pick fans out within its family directly, and across families when bookmaker names the brand that minted the key. Costs 2 credits per target code created; refunded if no code is created.",
     inputSchema: {
       type: "object",
       properties: {
         bookmaker: {
           type: "string",
-          description: "Primary target bookmaker key or alias (e.g. 'sportybet').",
+          description: "Bookmaker key or alias. For a key pick that fans out to another family, this is the bookmaker that minted the key; include home_team and away_team when the target event_id differs.",
         },
         plan_id: {
           type: "string",
@@ -578,7 +606,8 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
         picks: {
           type: "array",
           items: { type: "object" },
-          description: "Direct game picks when booking without a plan_id.",
+          description:
+            "Direct game picks when booking without a plan_id. Each pick carries event_id plus either key or market and outcome.",
         },
         to: {
           type: "array",

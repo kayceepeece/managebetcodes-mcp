@@ -6,7 +6,7 @@ Zero runtime dependencies. Works with Claude Desktop, Cursor, Windsurf, Zed, Ope
 
 ## Get an API key
 
-Paid actions need an API key. Read-only tools (bookmakers, markets, search, resolve, usage) cost 0 credits.
+Paid actions need an API key. Catalogs and usage cost 0 credits. Event search, event markets, and pick resolution spend work units against the daily cap: one per query, one per market call, and one per pick. Free accounts carry no search charge.
 
 1. Create a free account at https://managebetcodes.app (no card needed).
 2. Open the API dashboard at https://managebetcodes.app/dashboard/api and create a key. Keys start with `mbc_live_`.
@@ -136,9 +136,9 @@ Required parameters are marked with `*`.
 - `mbc_split_code`: Split 1 code into 2 to 20 codes on the same bookmaker (2 credits plus 1 per extra created code). Parameters: `code*`, `bookmaker*`, `method` (`equal`, `by_batches`, `target_odds`, or `custom`), `order` (`mixed` or `by_start_time`), `count` (integer, for `equal` and `by_batches`), `target_odds` (number, for `target_odds`), `counts` (array of integers, for `custom`).
 - `mbc_merge_codes`: Merge 2 to 30 `(bookmaker, code)` pairs into 1 deduplicated code. Pricing: 2 credits cover the first code (one already on the target bookmaker if any); each other code adds 1 credit if it is on the target bookmaker or 2 if it is from a different bookmaker; refunded if no code is created. Parameters: `pairs*` (array of `{bookmaker, code}` objects), `target` (bookmaker key, optional).
 - `mbc_search_events`: Batch search up to 20 team or fixture queries with markets (0 credits; counts against the daily search cap). Parameters: `bookmaker*`, `queries*` (array of strings, for example `"Arsenal vs Chelsea"`), `sport` (optional), `include_markets` (boolean, optional), `market_filter` (array, optional).
-- `mbc_get_event_markets`: List all canonical markets and live odds for one event (0 credits). Parameters: `bookmaker*`, `event_id*`.
-- `mbc_resolve_picks`: Validate 1 to 50 games into a 10-minute `plan_id` (0 credits). Parameters: `bookmaker*`, `picks*` (array of game objects with teams or `event_id`, market, outcome, and optional line or odds), `strict` (boolean, optional), `accept_odds_change` (boolean, optional).
-- `mbc_book_code`: Mint a verified booking code on 1 to 6 targets from a `plan_id` or direct `picks` (2 credits per code created). Parameters: `plan_id` (from `mbc_resolve_picks`) or `picks`, plus `bookmaker` or `to` (targets), `strict` and `accept_odds_change` (optional).
+- `mbc_get_event_markets`: List market names, then fetch one market or a filtered view with live odds (1 work unit). Parameters: `bookmaker*`, `event_id*`, `view` (`canonical` or `all`), `market` (name or substring), `q` (substring), `names_only` (boolean). A bare `view=all` is rejected; call `names_only=true` first.
+- `mbc_resolve_picks`: Validate 1 to 50 games into a 10-minute `plan_id` (1 work unit per pick). Parameters: `bookmaker*`, `picks*` (array of game objects; each pick carries `event_id` plus either `key` from `mbc_get_event_markets` or a canonical `market` and `outcome`, and optional line or odds), `strict` (boolean, optional), `accept_odds_change` (boolean, optional).
+- `mbc_book_code`: Mint a verified booking code on 1 to 6 targets from a `plan_id` or direct `picks` (2 credits per code created). Parameters: `plan_id` (from `mbc_resolve_picks`) or `picks`, plus `bookmaker` (the brand that minted a key, needed for cross-family fan-out; include team names when the target event_id differs) or `to` (targets), `strict` and `accept_odds_change` (optional).
 - `mbc_manage_tracking`: Start (1 credit), inspect, list, or stop live match tracking on SportyBet, Football.com, and Betway. Parameters: `action*` (`start`, `get`, `list`, or `stop`), `code` and `bookmaker` (for `start`), `track_id` (for `get` and `stop`), `mode` (`ticket` or `game`, for `start`), `label`, `webhook_url`, `status` (optional).
 - `mbc_manage_jobs_and_history`: Create, poll, or cancel async jobs (bulk jobs need a Developer, Scale, or Business plan), or query conversion and book history (reads cost 0 credits). Parameters: `action*`, `job_payload` (object, for job creation), `job_id`, `row_id`, `limit`, `offset`, `status`, `bookmaker`, `target` (optional filters).
 
