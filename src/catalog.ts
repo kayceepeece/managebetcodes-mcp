@@ -402,7 +402,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_search_events",
     title: "Search Bookmaker Events & Fixtures",
     description:
-      "Search up to 20 team or head-to-head match queries ('Arsenal vs Chelsea', 'Real Madrid') on a bookmaker. Returns event IDs, kickoff times, confidence ('exact' or 'fuzzy'), and top canonical markets. Costs 0 action credits (counts against daily search cap).",
+      "Search up to 20 team or head-to-head match queries ('Arsenal vs Chelsea', 'Real Madrid') on a bookmaker. Returns event IDs, kickoff times, confidence ('exact' or 'fuzzy'), and top canonical markets. Spends 1 work unit per query against the daily cap. Costs 0 credits.",
     inputSchema: {
       type: "object",
       properties: {
@@ -464,7 +464,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_get_event_markets",
     title: "Get All Markets & Odds for an Event",
     description:
-      "Fetch markets, lines, outcomes, and live odds for one event_id on a bookmaker. Start with names_only=true to learn the market names, then request one name with market= or narrow with q=. view=all adds native markets (canonical: false) and needs market= or q=. Each outcome carries a key for mbc_resolve_picks. Costs one search unit per call.",
+      "Fetch markets, lines, outcomes, and live odds for one event_id on a bookmaker. Start with names_only=true to learn the market names, then request one name with market= or narrow with q=. view=all adds native markets (canonical: false) and needs market= or q=. Each outcome carries a key for mbc_resolve_picks. Spends 1 work unit per call against the daily cap. Costs 0 credits.",
     inputSchema: {
       type: "object",
       properties: {
@@ -523,7 +523,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_resolve_picks",
     title: "Resolve Games Into a 10-Minute Booking Plan",
     description:
-      "Validate 1 to 50 games (team names or event_ids plus canonical market, outcome, and optional line/odds) on a target bookmaker and create a 10-minute plan_id for mbc_book_code. Returns per-game status ('resolved', 'ambiguous', 'not_found', 'market_missing', 'odds_changed', 'not_bookable'). Costs 0 action credits.",
+      "Validate 1 to 50 games (team names or event_ids plus canonical market, outcome, and optional line/odds) on a target bookmaker and create a 10-minute plan_id for mbc_book_code. Returns per-game status ('resolved', 'ambiguous', 'not_found', 'market_missing', 'odds_changed', 'not_bookable'). Spends 1 work unit per pick against the daily cap. Costs 0 credits.",
     inputSchema: {
       type: "object",
       properties: {
