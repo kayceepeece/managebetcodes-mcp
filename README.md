@@ -55,9 +55,9 @@ The endpoint answers `initialize` and `tools/list` without a key. Tool calls tha
 
 ## Supported bookmakers and regions
 
-44 bookmakers. Bookmaker keys are the values you pass as `bookmaker`, `from_bookmaker`, and target parameters.
+45 bookmakers. Bookmaker keys are the values you pass as `bookmaker`, `from_bookmaker`, and target parameters.
 
-Nigeria and international (these 28 are also the default conversion targets):
+Nigeria and international (these 29 are also default conversion targets, along with Stake in the regional table):
 
 | Key | Bookmaker |
 |---|---|
@@ -89,6 +89,7 @@ Nigeria and international (these 28 are also the default conversion targets):
 | `888starz` | 888starz |
 | `winwinbet` | WinwinBet |
 | `xparibet` | Xparibet |
+| `fansport` | FanSport |
 
 Regional variants (full view, split, merge, and conversion support):
 
@@ -125,13 +126,13 @@ Notes:
 
 Required parameters are marked with `*`.
 
-- `mbc_list_bookmakers`: List all 44 bookmakers, canonical keys, aliases, and capability flags (0 credits). Parameters: none.
+- `mbc_list_bookmakers`: List all 45 bookmakers, canonical keys, aliases, and capability flags (0 credits). Parameters: none.
 - `mbc_list_markets`: List canonical markets and valid outcomes (0 credits). Names only; a bookmaker may list only some of them. Parameters: none.
 - `mbc_get_usage`: Check plan, `charge_order`, API credits, regular daily credits, and rate limits (0 credits). Parameters: none.
 - `mbc_view_slip`: Inspect a slip's games, markets, odds, scores, and kickoff times (1 credit after success). Parameters: `code*` (string), `bookmaker*` (string).
 - `mbc_view_slip_image`: Render a branded PNG slip image as MCP `ImageContent` (2 credits after success). Parameters: `code*`, `bookmaker*`.
 - `mbc_convert_code`: Convert 1 code to 1 to 6 target bookmakers (2 credits per successful target; failed targets refunded). Parameters: `code*`, `from_bookmaker*`, `to_bookmakers*` (array of bookmaker keys).
-- `mbc_convert_to_all`: Convert 1 code to all 28 default target bookmakers at once, or to a custom subset (2 credits per successful target). Parameters: `code*`, `from_bookmaker*`, `targets` (array, optional), `include_card` (boolean, optional).
+- `mbc_convert_to_all`: Convert 1 code to all 30 default target bookmakers at once, or to a custom subset (2 credits per successful target). Parameters: `code*`, `from_bookmaker*`, `targets` (array, optional), `include_card` (boolean, optional).
 - `mbc_bulk_convert`: Bulk convert 2 to 4 source codes across selected or all bookmakers (2 credits per successful pair). Parameters: `codes*` (array), `targets` (array, optional), `include_card` (boolean, optional).
 - `mbc_split_code`: Split 1 code into 2 to 20 codes on the same bookmaker (2 credits plus 1 per extra created code). Parameters: `code*`, `bookmaker*`, `method` (`equal`, `by_batches`, `target_odds`, or `custom`), `order` (`mixed` or `by_start_time`), `count` (integer, for `equal` and `by_batches`), `target_odds` (number, for `target_odds`), `counts` (array of integers, for `custom`).
 - `mbc_merge_codes`: Merge 2 to 30 `(bookmaker, code)` pairs into 1 deduplicated code. Pricing: 2 credits cover the first code (one already on the target bookmaker if any); each other code adds 1 credit if it is on the target bookmaker or 2 if it is from a different bookmaker; refunded if no code is created. Parameters: `pairs*` (array of `{bookmaker, code}` objects), `target` (bookmaker key, optional).
