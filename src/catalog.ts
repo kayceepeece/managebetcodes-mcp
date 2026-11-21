@@ -163,7 +163,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_convert_code",
     title: "Convert Bet Code (1 to 6 Targets)",
     description:
-      "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 30), use mbc_convert_to_all.",
+      "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 29), use mbc_convert_to_all.",
     inputSchema: {
       type: "object",
       properties: {
@@ -201,7 +201,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_convert_to_all",
     title: "Convert One Bet Code to All Bookmakers",
     description:
-      "Convert one booking code to all 30 default target bookmakers at once (up to 30 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com, Betway, FanSport, Stake), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits. Country variants are opt-in through the targets list.",
+      "Convert one booking code to all 29 default target bookmakers at once (up to 29 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com, Betway, FanSport), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits. Country variants are opt-in through the targets list.",
     inputSchema: {
       type: "object",
       properties: {
