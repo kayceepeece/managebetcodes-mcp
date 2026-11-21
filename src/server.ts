@@ -5,7 +5,7 @@ import {
   MCP_TOOLS,
 } from "./catalog.js";
 
-export const VERSION = "1.0.1";
+export const VERSION = "1.0.2";
 export const BASE_URL = "https://api.managebetcodes.app/v1";
 export const SERVER_NAME = "managebetcodes-mcp";
 
