@@ -95,7 +95,7 @@
     {
       "name": "Supported Bookmakers & Capabilities",
       "uri": "mbc://catalog/bookmakers",
-      "description": "All 44 bookmakers, canonical keys, aliases, code regex hints, and capability flags.",
+      "description": "All 45 bookmakers, canonical keys, aliases, code regex hints, and capability flags.",
       "mimeType": "application/json"
     },
     {
@@ -131,7 +131,7 @@
     {
       "name": "mbc_list_bookmakers",
       "title": "List Supported Bookmakers",
-      "description": "List all 44 supported bookmakers with their canonical keys, aliases, code format hints, and capability flags (supports_book, supports_search, supports_tracking, supports_split, conversion_mode, countries). Costs 0 credits. Note: bare '1xbet' and 'afropari' are retired; use '1xng'/'1xglobal' and 'afropari_ng'/'afropari_global'.",
+      "description": "List all 45 supported bookmakers with their canonical keys, aliases, code format hints, and capability flags (supports_book, supports_search, supports_tracking, supports_split, conversion_mode, countries). Costs 0 credits. Note: bare '1xbet' and 'afropari' are retired; use '1xng'/'1xglobal' and 'afropari_ng'/'afropari_global'.",
       "inputSchema": {
         "type": "object",
         "properties": {},
@@ -158,7 +158,7 @@
     {
       "name": "mbc_list_markets",
       "title": "List Canonical Betting Markets",
-      "description": "List all canonical betting markets (1X2, Over/Under, Both Teams To Score, Double Chance, Asian Handicap, European Handicap, totals) and their valid outcome names for resolving and booking games. Costs 0 credits.",
+      "description": "List all canonical betting markets (1X2, Over/Under, Both Teams To Score, Double Chance, Asian Handicap, European Handicap, totals) and their valid outcome names for resolving and booking games. Names only; a bookmaker may list only some of them. Costs 0 credits.",
       "inputSchema": {
         "type": "object",
         "properties": {},
@@ -317,7 +317,7 @@
     {
       "name": "mbc_convert_code",
       "title": "Convert Bet Code (1 to 6 Targets)",
-      "description": "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 28), use mbc_convert_to_all.",
+      "description": "Convert a booking code from one source bookmaker to 1 target bookmaker or a synchronous batch of up to 6 target bookmakers. Costs 2 credits per target that produces a code; failed targets are automatically refunded. To convert to all bookmakers at once (up to 29), use mbc_convert_to_all.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -376,7 +376,7 @@
     {
       "name": "mbc_convert_to_all",
       "title": "Convert One Bet Code to All Bookmakers",
-      "description": "Convert one booking code to all 28 default target bookmakers at once (up to 28 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com, Betway), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits. Country variants are opt-in through the targets list.",
+      "description": "Convert one booking code to all 29 default target bookmakers at once (up to 29 target bookmakers: SportyBet, 1xBet Global, 1xBet NG, MSport, Paripesa, 22Bet, Megapari, 888starz, Afropari NG, Afropari Global, Betwinner, Melbet, Helabet, Fastpari, Xparibet, Goldpari, 1xBit, WinWinBet, DBBet, Paripulse, BetJam, Planbet, Linebet, Luckypari, Bet9ja, BetKing, Football.com, Betway, FanSport), or pass a custom targets subset. Uses per-family concurrency lanes. Costs 2 credits per successful target code; failed targets cost 0 credits. Country variants are opt-in through the targets list.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -507,7 +507,7 @@
     },
     {
       "name": "mbc_split_code",
-      "title": "Split Bet Code Into 2–20 Codes",
+      "title": "Split Bet Code Into 2\u201320 Codes",
       "description": "Divide one booking code into 2 to 20 smaller codes on the same bookmaker so every game lands in exactly one new code. Supports 4 split methods: 'equal' (spread games evenly across codes), 'by_batches' (keep consecutive games together in each code), 'target_odds' (group games to reach a chosen combined odds per code), and 'custom' (set exact game counts per output code). Supports 2 game orders: 'mixed' (keep original slip order) and 'by_start_time' (earliest games first, latest games last). Costs 2 credits plus 1 credit per extra created code; unused parts are refunded.",
       "inputSchema": {
         "type": "object",
@@ -579,6 +579,9 @@
           },
           "billing": {
             "type": "object"
+          },
+          "feasibility": {
+            "type": "object"
           }
         }
       },
@@ -591,8 +594,8 @@
     },
     {
       "name": "mbc_merge_codes",
-      "title": "Merge 2–30 Bet Codes Into One",
-      "description": "Combine 2 to 30 booking codes (from the same or different bookmakers) into one deduplicated booking code on a target bookmaker. Reports any skipped, dropped, or conflicting games. Costs 2 credits for 2 codes plus 1 credit per extra input code; refunded if no code is created.",
+      "title": "Merge 2\u201330 Bet Codes Into One",
+      "description": "Combine 2 to 30 booking codes (from the same or different bookmakers) into one deduplicated booking code on a target bookmaker. Reports any skipped, dropped, or conflicting games. Costs 2 credits for the first code, plus 1 credit for each other code on the target bookmaker and 2 credits for each code from another bookmaker; refunded if no code is created.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -655,7 +658,7 @@
     {
       "name": "mbc_search_events",
       "title": "Search Bookmaker Events & Fixtures",
-      "description": "Search up to 20 team or head-to-head match queries ('Arsenal vs Chelsea', 'Real Madrid') on a bookmaker. Returns event IDs, kickoff times, confidence ('exact' or 'fuzzy'), and top canonical markets. Costs 0 action credits (counts against daily search cap).",
+      "description": "Search up to 20 team or head-to-head match queries ('Arsenal vs Chelsea', 'Real Madrid') on a bookmaker. Returns event IDs, kickoff times, confidence ('exact' or 'fuzzy'), and top canonical markets. Spends 1 work unit per query against the daily cap. Costs 0 credits.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -737,7 +740,7 @@
     {
       "name": "mbc_get_event_markets",
       "title": "Get All Markets & Odds for an Event",
-      "description": "Fetch all available canonical markets, lines, outcomes, and live odds for one event_id on a bookmaker. Costs 0 action credits.",
+      "description": "Fetch markets, lines, outcomes, and live odds for one event_id on a bookmaker. Start with names_only=true to learn the market names, then request one or more names with market= or narrow with q=. view=all adds native markets (canonical: false) and needs market= or q=. Each outcome carries a key for mbc_resolve_picks. Repeat market= to read several names in one call; the response lists the missing names in not_found. Spends 1 work unit per call against the daily cap. Costs 0 credits.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -748,6 +751,32 @@
           "event_id": {
             "type": "string",
             "description": "Event ID from mbc_search_events (e.g. 'sr:match:123')."
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "canonical",
+              "all"
+            ],
+            "description": "canonical (default) or all. all requires market= or q=."
+          },
+          "market": {
+            "type": [
+              "string",
+              "array"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Full market name (exact, case-insensitive) or a substring. Repeat it to request several names."
+          },
+          "q": {
+            "type": "string",
+            "description": "Substring match against every canonical and native market name."
+          },
+          "names_only": {
+            "type": "boolean",
+            "description": "Return the names only, with no outcomes or prices. The list is complete, not capped."
           }
         },
         "required": [
@@ -764,7 +793,22 @@
           "event_id": {
             "type": "string"
           },
+          "requested": {
+            "type": "array"
+          },
+          "truncated": {
+            "type": "boolean"
+          },
           "markets": {
+            "type": "array"
+          },
+          "not_found": {
+            "type": "array"
+          },
+          "count": {
+            "type": "number"
+          },
+          "names": {
             "type": "array"
           }
         }
@@ -779,7 +823,7 @@
     {
       "name": "mbc_resolve_picks",
       "title": "Resolve Games Into a 10-Minute Booking Plan",
-      "description": "Validate 1 to 50 games (team names or event_ids plus canonical market, outcome, and optional line/odds) on a target bookmaker and create a 10-minute plan_id for mbc_book_code. Returns per-game status ('resolved', 'ambiguous', 'not_found', 'market_missing', 'odds_changed', 'not_bookable'). Costs 0 action credits.",
+      "description": "Validate 1 to 50 games (team names or event_ids plus canonical market, outcome, and optional line/odds) on a target bookmaker and create a 10-minute plan_id for mbc_book_code. Returns per-game status ('resolved', 'ambiguous', 'not_found', 'market_missing', 'odds_changed', 'not_bookable'). Spends 1 work unit per pick against the daily cap. Costs 0 credits.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -813,19 +857,17 @@
                 "sport": {
                   "type": "string"
                 },
+                "key": {
+                  "type": "string",
+                  "description": "Selection key from mbc_get_event_markets. Send it with event_id in the same pick."
+                },
                 "market": {
                   "type": "string",
                   "description": "Canonical market (e.g. '1X2', 'Over/Under', 'Both Teams To Score', 'Double Chance')."
                 },
-                "market_id": {
-                  "type": "string"
-                },
                 "outcome": {
                   "type": "string",
                   "description": "Canonical outcome (e.g. 'home', 'draw', 'away', 'over', 'under', 'yes', 'no', '1X', '12', '2X')."
-                },
-                "outcome_id": {
-                  "type": "string"
                 },
                 "line": {
                   "type": [
@@ -883,13 +925,13 @@
     {
       "name": "mbc_book_code",
       "title": "Book a New Bet Code From Plan or Picks",
-      "description": "Mint a new verified booking code on 1 to 6 target bookmakers from either a plan_id (from mbc_resolve_picks) or direct picks. Costs 2 credits per target code created; refunded if no code is created.",
+      "description": "Mint a new verified booking code on 1 to 6 target bookmakers from either a plan_id (from mbc_resolve_picks) or direct picks. A key pick fans out within its family directly, and across families when bookmaker names the brand that minted the key. Costs 2 credits per target code created; refunded if no code is created.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "bookmaker": {
             "type": "string",
-            "description": "Primary target bookmaker key or alias (e.g. 'sportybet')."
+            "description": "Bookmaker key or alias. For a key pick that fans out to another family, this is the bookmaker that minted the key; include home_team and away_team when the target event_id differs."
           },
           "plan_id": {
             "type": "string",
@@ -900,7 +942,7 @@
             "items": {
               "type": "object"
             },
-            "description": "Direct game picks when booking without a plan_id."
+            "description": "Direct game picks when booking without a plan_id. Each pick carries event_id plus either key or market and outcome."
           },
           "to": {
             "type": "array",
