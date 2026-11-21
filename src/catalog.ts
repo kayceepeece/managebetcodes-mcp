@@ -54,7 +54,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_list_markets",
     title: "List Canonical Betting Markets",
     description:
-      "List all canonical betting markets (1X2, Over/Under, Both Teams To Score, Double Chance, Asian Handicap, European Handicap, totals) and their valid outcome names for resolving and booking games. Costs 0 credits.",
+      "List all canonical betting markets (1X2, Over/Under, Both Teams To Score, Double Chance, Asian Handicap, European Handicap, totals) and their valid outcome names for resolving and booking games. Names only; a bookmaker may list only some of them. Costs 0 credits.",
     inputSchema: { type: "object", properties: {}, required: [] },
     outputSchema: {
       type: "object",
@@ -464,7 +464,7 @@ export const MCP_TOOLS: readonly McpToolDefinition[] = [
     name: "mbc_get_event_markets",
     title: "Get All Markets & Odds for an Event",
     description:
-      "Fetch markets, lines, outcomes, and live odds for one event_id on a bookmaker. Start with names_only=true to learn the market names, then request one name with market= or narrow with q=. view=all adds native markets (canonical: false) and needs market= or q=. Each outcome carries a key for mbc_resolve_picks. Spends 1 work unit per call against the daily cap. Costs 0 credits.",
+      "Fetch markets, lines, outcomes, and live odds for one event_id on a bookmaker. Start with names_only=true to learn the market names, then request one or more names with market= or narrow with q=. view=all adds native markets (canonical: false) and needs market= or q=. Each outcome carries a key for mbc_resolve_picks. Repeat market= to read several names in one call; the response lists the missing names in not_found. Spends 1 work unit per call against the daily cap. Costs 0 credits.",
     inputSchema: {
       type: "object",
       properties: {
