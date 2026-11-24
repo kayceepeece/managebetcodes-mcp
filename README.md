@@ -1,5 +1,7 @@
 # `@managebetcodes/mcp`
 
+[![Manage Bet Codes MCP connector](https://glama.ai/mcp/connectors/app.managebetcodes.api/manage-bet-codes/badges/score.svg)](https://glama.ai/mcp/connectors/app.managebetcodes.api/manage-bet-codes)
+
 Official Model Context Protocol (MCP) server for the [Manage Bet Codes Public API v1](https://managebetcodes.app/docs), published and maintained by Manage Bet Codes (https://managebetcodes.app). This repository is the official source of the npm package `@managebetcodes/mcp` and of the Official MCP Registry entry `app.managebetcodes/managebetcodes-mcp`.
 
 Zero runtime dependencies. Works with Claude Desktop, Cursor, Windsurf, Zed, OpenCode, and any MCP host over `stdio`, or connect directly to the remote Streamable HTTP endpoint at `https://api.managebetcodes.app/v1/mcp`.
